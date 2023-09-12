@@ -5,8 +5,15 @@ const app = express();
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
 
+
+require('dotenv').config();
+
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const dbHost = process.env.DB_HOST;
+
 // Connexion à MongoDB
-mongoose.connect('mongodb+srv://nicolas:projet7oc@cluster0.r1qtcyc.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect(`mongodb+srv://${dbUser}:${dbPassword}@${dbHost}/?retryWrites=true&w=majority`, {
   useNewUrlParser: true,
   useUnifiedTopology: true 
 })
@@ -21,7 +28,6 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
 });
-
 
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', userRoutes);
