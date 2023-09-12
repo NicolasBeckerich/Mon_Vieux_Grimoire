@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 
+const booksRoutes = require('./routes/books');
+
 // Connexion à MongoDB
 mongoose.connect('mongodb+srv://nicolas:projet7oc@cluster0.r1qtcyc.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
@@ -19,4 +21,6 @@ app.use((req, res, next) => {
     next();
 });
 
+
+app.use('/api/books', booksRoutes);
 module.exports = app;
