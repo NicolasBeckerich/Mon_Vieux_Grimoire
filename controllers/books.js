@@ -104,3 +104,38 @@ function updateBook(bookObject, req, res) {
         .then(() => res.status(200).json({ message: 'Livre modifié !' }))
         .catch(error => res.status(400).json({ error }));
 }
+
+
+exports.addRating = (req, res, next) => {
+    const bookId = req.params.id;
+    const userId = req.body.userId;
+    const grade = req.body.rating;
+
+    if (grade < 0 || grade > 5) {
+        return res.status(400).json({ error: 'La note doit être comprise entre 0 et 5.' });
+    }
+
+    Book.findOne({ _id: bookId })
+        .then(book => {
+            if (!book) {
+                return res.status(404).json({ message: 'Livre non trouvé !' });
+            }
+
+            const userRating = book.ratings.find(rating => rating.userId === userId);
+            if (userRating) {
+                return res.status(400).json({ error: "L'utilisateur a déjà noté ce livre." });
+            }
+
+            book.ratings.push({ userId, grade });
+
+            const totalRatings = book.ratings.reduce((sum, rating) => sum + rating.grade, 0);
+            book.averageRating = totalRatings / book.ratings.length;
+
+            book.save()
+                .then(() => res.status(200).json({ message: 'Note ajoutée avec succès !', book }))
+                .catch(error => res.status(400).json({ error }));
+        })
+        .catch(error => {
+            res.status(400).json({ error });
+        });
+};
