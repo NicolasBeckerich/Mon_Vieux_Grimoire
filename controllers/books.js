@@ -108,7 +108,7 @@ function updateBook(bookObject, req, res) {
 
 exports.addRating = (req, res, next) => {
     const bookId = req.params.id;
-    const userId = req.body.userId;
+    const userId = req.auth.userId;
     const grade = req.body.rating;
 
     if (grade < 0 || grade > 5) {
@@ -134,6 +134,18 @@ exports.addRating = (req, res, next) => {
             book.save()
                 .then(() => res.status(200).json({ message: 'Note ajoutée avec succès !', book }))
                 .catch(error => res.status(400).json({ error }));
+        })
+        .catch(error => {
+            res.status(400).json({ error });
+        });
+};
+
+exports.getBestBooks = (req, res, next) => {
+    Book.find()
+        .sort({ averageRating: -1 })
+        .limit(3)
+        .then(books => {
+            res.status(200).json(books);
         })
         .catch(error => {
             res.status(400).json({ error });
