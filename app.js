@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const rateLimit = require("express-rate-limit");
 const app = express();
 
 const booksRoutes = require('./routes/books');
@@ -21,6 +22,14 @@ mongoose.connect(`mongodb+srv://${dbUser}:${dbPassword}@${dbHost}/?retryWrites=t
 .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 app.use(express.json());
+
+const loginLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10, 
+  message: "Trop de tentatives de connexion, veuillez réessayer plus tard"});
+
+  app.use("/api/auth/login", loginLimiter);
+
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
