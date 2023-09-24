@@ -46,7 +46,7 @@ exports.deleteBook = (req, res, next) => {
     Book.findOne({_id: req.params.id})
     .then(book => {
         // Vérification des droits de l'utilisateur
-        if (book.userId.toString() !== req.auth.userId) {
+        if (book.userId !== req.auth.userId) {
             return res.status(401).json({ message : 'Non-autorisé'});
         }
 
